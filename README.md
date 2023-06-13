@@ -5,7 +5,7 @@
 
 基于nacos提取
 
-### RAFT
+### Raft
 
 基于nacos提取
 
