@@ -1,4 +1,4 @@
-package com.luckylau.wheel;
+package com.luckylau.wheel.distro;
 
 /**
  * Hello world!

@@ -6,11 +6,17 @@
 
   <groupId>com.luckylau.wheel</groupId>
   <artifactId>wheel</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <version>${revision}</version>
+
+  <modules>
+    <module>distro-protocol</module>
+  </modules>
 
   <name>wheel</name>
 
   <properties>
+    <revision>1.0-SNAPSHOT</revision>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
