@@ -5,6 +5,8 @@ package com.luckylau.wheel.common.uti;
  * @Date 2023/7/9
  */
 public class StringUtils {
+    public static final String DOT = ".";
+
     /**
      * The empty String {@code ""}.
      *

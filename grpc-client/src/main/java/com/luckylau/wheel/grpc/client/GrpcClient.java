@@ -5,6 +5,7 @@ import com.alibaba.nacos.api.grpc.auto.Payload;
 import com.alibaba.nacos.api.grpc.auto.RequestGrpc;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.luckylau.wheel.common.Closeable;
 import com.luckylau.wheel.common.Constants;
 import com.luckylau.wheel.common.PayloadRegistry;
 import com.luckylau.wheel.common.ServerRequestHandler;
@@ -12,7 +13,6 @@ import com.luckylau.wheel.common.exception.GrpcException;
 import com.luckylau.wheel.common.request.*;
 import com.luckylau.wheel.common.response.*;
 import com.luckylau.wheel.common.uti.*;
-import com.luckylau.wheel.grpc.client.connection.Closeable;
 import com.luckylau.wheel.grpc.client.connection.Connection;
 import com.luckylau.wheel.grpc.client.connection.ConnectionEventListener;
 import com.luckylau.wheel.grpc.client.connection.GrpcConnection;
@@ -38,7 +38,7 @@ import static com.luckylau.wheel.common.exception.GrpcException.SERVER_ERROR;
  * @Date 2023/7/9
  */
 
-public class RpcClient implements Closeable {
+public class GrpcClient implements Closeable {
     private static final Logger LOGGER = LoggerFactory.getLogger("com.luckylau.wheel.grpc.client");
     private static final int RETRY_TIMES = 3;
     private static final long DEFAULT_TIMEOUT_MILLS = 3000L;
@@ -74,13 +74,13 @@ public class RpcClient implements Closeable {
     private ServerListFactory serverListFactory;
     private ThreadPoolExecutor grpcExecutor = null;
 
-    public RpcClient(ServerListFactory serverListFactory) {
+    public GrpcClient(ServerListFactory serverListFactory) {
         this.serverListFactory = serverListFactory;
         rpcClientStatus.compareAndSet(RpcClientStatus.WAIT_INIT, RpcClientStatus.INITIALIZED);
 
     }
 
-    public RpcClient(String name, ServerListFactory serverListFactory) {
+    public GrpcClient(String name, ServerListFactory serverListFactory) {
         this.serverListFactory = serverListFactory;
         this.name = name;
         rpcClientStatus.compareAndSet(RpcClientStatus.WAIT_INIT, RpcClientStatus.INITIALIZED);
@@ -91,7 +91,7 @@ public class RpcClient implements Closeable {
      *
      * @param labels labels
      */
-    public RpcClient labels(Map<String, String> labels) {
+    public GrpcClient labels(Map<String, String> labels) {
         if (labels != null && !labels.isEmpty()) {
             this.labels.putAll(labels);
         }
@@ -104,7 +104,7 @@ public class RpcClient implements Closeable {
      * @param keepAliveTime keepAliveTime
      * @param timeUnit      timeUnit
      */
-    public RpcClient keepAlive(long keepAliveTime, TimeUnit timeUnit) {
+    public GrpcClient keepAlive(long keepAliveTime, TimeUnit timeUnit) {
         this.keepAliveTime = keepAliveTime * timeUnit.toMillis(keepAliveTime);
         return this;
     }
@@ -256,12 +256,12 @@ public class RpcClient implements Closeable {
                                             "[{}]Server healthy check fail,currentConnection={}", name,
                                             currentConnection.getConnectionId());
 
-                                    RpcClientStatus rpcClientStatus = RpcClient.this.rpcClientStatus.get();
+                                    RpcClientStatus rpcClientStatus = GrpcClient.this.rpcClientStatus.get();
                                     if (RpcClientStatus.SHUTDOWN.equals(rpcClientStatus)) {
                                         break;
                                     }
 
-                                    boolean success = RpcClient.this.rpcClientStatus
+                                    boolean success = GrpcClient.this.rpcClientStatus
                                             .compareAndSet(rpcClientStatus, RpcClientStatus.UNHEALTHY);
                                     if (success) {
                                         reconnectContext = new ReconnectContext(null, false);
@@ -355,8 +355,9 @@ public class RpcClient implements Closeable {
 
     }
 
+    @Override
     public void shutdown() throws GrpcException {
-        LOGGER.info("Shutdown rpc client ,set status to shutdown");
+        LOGGER.info("Shutdown rpc  client ,set status to shutdown");
         rpcClientStatus.set(RpcClientStatus.SHUTDOWN);
         LOGGER.info("Shutdown  client event executor " + clientEventExecutor);
         clientEventExecutor.shutdownNow();
@@ -458,7 +459,7 @@ public class RpcClient implements Closeable {
                 }
 
                 if (reConnectTimes > 0
-                        && reConnectTimes % RpcClient.this.serverListFactory.getServerList().size() == 0) {
+                        && reConnectTimes % GrpcClient.this.serverListFactory.getServerList().size() == 0) {
                     LoggerUtils.printIfInfoEnabled(LOGGER,
                             "[{}] fail to connect server,after trying {} times, last try server is {},error={}", name,
                             reConnectTimes, serverInfo, lastException == null ? "unknown" : lastException);
@@ -756,7 +757,7 @@ public class RpcClient implements Closeable {
             }
             return null;
         } catch (Exception e) {
-            LOGGER.error("[{}]Fail to connect to server!,error={}", RpcClient.this.getName(), e);
+            LOGGER.error("[{}]Fail to connect to server!,error={}", GrpcClient.this.getName(), e);
         }
         return null;
     }
@@ -1101,7 +1102,7 @@ public class RpcClient implements Closeable {
             if (request instanceof ConnectResetRequest) {
 
                 try {
-                    synchronized (RpcClient.this) {
+                    synchronized (GrpcClient.this) {
                         if (isRunning()) {
                             ConnectResetRequest connectResetRequest = (ConnectResetRequest) request;
                             if (!StringUtils.isBlank(connectResetRequest.getServerIp())) {

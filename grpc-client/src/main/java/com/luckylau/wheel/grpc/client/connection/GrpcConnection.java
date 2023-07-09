@@ -14,7 +14,7 @@ import com.luckylau.wheel.common.response.ErrorResponse;
 import com.luckylau.wheel.common.response.Response;
 import com.luckylau.wheel.common.response.ResponseCode;
 import com.luckylau.wheel.common.uti.GrpcUtils;
-import com.luckylau.wheel.grpc.client.RpcClient;
+import com.luckylau.wheel.grpc.client.GrpcClient;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
 
@@ -40,7 +40,7 @@ public class GrpcConnection extends Connection {
     protected StreamObserver<Payload> payloadStreamObserver;
     Executor executor;
 
-    public GrpcConnection(RpcClient.ServerInfo serverInfo, Executor executor) {
+    public GrpcConnection(GrpcClient.ServerInfo serverInfo, Executor executor) {
         super(serverInfo);
         this.executor = executor;
     }

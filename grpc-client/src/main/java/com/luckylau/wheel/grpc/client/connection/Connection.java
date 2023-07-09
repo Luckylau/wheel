@@ -6,7 +6,7 @@ import com.luckylau.wheel.common.request.Request;
 import com.luckylau.wheel.common.request.RequestCallBack;
 import com.luckylau.wheel.common.request.RequestFuture;
 import com.luckylau.wheel.common.response.Response;
-import com.luckylau.wheel.grpc.client.RpcClient;
+import com.luckylau.wheel.grpc.client.GrpcClient;
 
 
 /**
@@ -18,9 +18,9 @@ public class Connection implements Requester {
 
     private boolean abandon = false;
 
-    private RpcClient.ServerInfo serverInfo;
+    private GrpcClient.ServerInfo serverInfo;
 
-    public Connection(RpcClient.ServerInfo serverInfo) {
+    public Connection(GrpcClient.ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
     }
 
@@ -71,11 +71,11 @@ public class Connection implements Requester {
         this.abandon = abandon;
     }
 
-    public RpcClient.ServerInfo getServerInfo() {
+    public GrpcClient.ServerInfo getServerInfo() {
         return serverInfo;
     }
 
-    public void setServerInfo(RpcClient.ServerInfo serverInfo) {
+    public void setServerInfo(GrpcClient.ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
     }
 }

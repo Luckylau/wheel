@@ -40,7 +40,7 @@ public class GrpcUtils {
      * @return json string
      * @throws SerializationException if transfer failed
      */
-    private static String toJson(Object obj) {
+    public static String toJson(Object obj) {
         try {
             return mapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
